@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sorteo · Amigo Invisible X</title>
+<style>
+  :root{--bg:#1b1035;--bg2:#2a1750;--ink:#fff7e6;--muted:#c9b8ff;--pink:#ff4fa3;--yellow:#ffd23f;--teal:#2de2c5;--orange:#ff8a3d}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Trebuchet MS","Comic Sans MS",system-ui,sans-serif;color:var(--ink);background:var(--bg);
+    background-image:radial-gradient(circle at 20% 10%,#4b1d8f55,transparent 40%),radial-gradient(circle at 85% 30%,#ff4fa333,transparent 35%);line-height:1.5;min-height:100vh}
+  .wrap{max-width:720px;margin:0 auto;padding:0 18px 60px}
+  header{text-align:center;padding:26px 0 8px}
+  .logo{font-size:4.2rem;font-weight:900;margin:0;color:var(--yellow);text-shadow:3px 3px 0 var(--pink),6px 6px 0 var(--teal);line-height:1}
+  .logo a{color:inherit;text-decoration:none}
+  .sub{color:var(--muted);margin:6px 0 0}
+  .steps{display:flex;gap:6px;justify-content:center;margin:14px 0 4px;flex-wrap:wrap}
+  .steps span{font-size:.8rem;padding:3px 10px;border-radius:99px;background:#00000040;color:var(--muted)}
+  .steps span.on{background:var(--yellow);color:#1b1035;font-weight:900}
+  .box{background:var(--bg2);border:3px solid var(--yellow);border-radius:22px;padding:22px;margin:22px 0;box-shadow:8px 8px 0 var(--pink)}
+  h2{margin:0 0 8px;color:var(--yellow);font-size:1.5rem}
+  p{margin:8px 0}
+  .hint{color:var(--muted);font-size:.95rem}
+  input[type=text],select,textarea{font:inherit;width:100%;padding:11px 13px;border-radius:12px;border:3px solid #1b1035;background:#fff7e6;color:#1b1035}
+  textarea{min-height:90px;resize:vertical}
+  .btn{font:inherit;font-weight:900;font-size:1.05rem;border:3px solid #1b1035;border-radius:14px;padding:11px 18px;cursor:pointer;background:var(--yellow);color:#1b1035;box-shadow:4px 4px 0 #1b1035;text-decoration:none;display:inline-block}
+  .btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 #1b1035}
+  .btn.alt{background:var(--teal)} .btn.pk{background:var(--pink);color:#fff} .btn.ghost{background:#fff7e6}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.big{font-size:1.3rem;padding:16px 22px;width:100%}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .row > *{flex:1 1 140px}
+  .row .fix{flex:0 0 auto}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+  .chip{display:inline-flex;align-items:center;gap:8px;background:#00000040;border-radius:99px;padding:6px 8px 6px 14px}
+  .chip button{border:0;background:var(--pink);color:#fff;border-radius:50%;width:24px;height:24px;font-weight:900;cursor:pointer}
+  .names{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
+  .names .btn{width:100%}
+  .names .btn.done{background:#00000050;color:var(--muted);box-shadow:none;border-color:#00000060}
+  .check{display:flex;gap:8px;align-items:center;margin:8px 0}
+  .check input{width:20px;height:20px}
+  .err{background:#ff4fa344;border:2px solid var(--pink);border-radius:12px;padding:8px 12px;margin:10px 0}
+  .reveal{text-align:center;padding:10px 0}
+  .reveal .who{font-size:2.4rem;font-weight:900;color:var(--yellow);text-shadow:3px 3px 0 var(--pink);word-break:break-word}
+  .reveal .curse{background:#fff7e6;color:#1b1035;border-radius:14px;padding:12px 16px;margin:12px 0;font-weight:700;font-size:1.2rem;transform:rotate(-1deg);word-break:break-word}
+  .tiny{font-size:.85rem;color:var(--muted);text-align:center;margin-top:18px}
+  .link{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;font:inherit}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 class="logo"><a href="index.html" title="Volver a las instrucciones">AIX</a></h1>
+    <p class="sub">El sorteo</p>
+    <div class="steps" id="steps"></div>
+  </header>
+  <main id="app"></main>
+  <p class="tiny">Todo ocurre en este dispositivo: no se envía nada a ningún sitio.<br>
+    <button class="link" id="reset">Empezar de nuevo</button> · <a class="link" href="index.html">Ver instrucciones</a></p>
+</div>
+
+<script>
+(function(){
+  var KEY = 'aix_sorteo_v1';
+  var PHASES = [['names','1 · Participantes'],['excl','2 · Exclusiones'],['curses','3 · Maldiciones'],['draw','4 · Sorteo']];
+  var S = load() || fresh();
+  var ui = { err:'', step:null, who:null, reveal:null, curseWho:null, msg:'' };
+
+  function fresh(){ return { phase:'names', names:[], excl:[], curses:{}, assign:null, seen:{} }; }
+  function load(){ try{ var r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; }catch(e){ return null; } }
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+  function el(tag, attrs, kids){
+    var e = document.createElement(tag);
+    for (var k in (attrs||{})){
+      if (k === 'text') e.textContent = attrs[k];
+      else if (k.slice(0,2) === 'on') e.addEventListener(k.slice(2), attrs[k]);
+      else e.setAttribute(k, attrs[k]);
+    }
+    (kids||[]).forEach(function(c){ if (c) e.appendChild(c); });
+    return e;
+  }
+  function box(title, kids){ var b = el('div',{class:'box'}); if (title) b.appendChild(el('h2',{text:title})); kids.forEach(function(k){ if(k) b.appendChild(k); }); return b; }
+  function para(text, cls){ return el('p', {text:text, class:cls||''}); }
+  function btn(text, fn, cls, dis){ var b = el('button',{class:'btn '+(cls||''), text:text, onclick:fn, type:'button'}); if (dis) b.disabled = true; return b; }
+  function errBox(){ return ui.err ? el('div',{class:'err',text:ui.err}) : null; }
+  function shuffle(a){ a = a.slice(); for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+  function excluded(a,b){ return S.excl.some(function(x){ return x[0]===a && x[1]===b; }); }
+
+  // ---------- Solver ----------
+  function solve(n, allowed){
+    var order = shuffle(Array.apply(null,Array(n)).map(function(_,i){return i;}))
+      .sort(function(a,b){ return allowed[a].length - allowed[b].length; });
+    var res = Array.apply(null,Array(n)).map(function(){return -1;});
+    var used = {}, nodes = 0;
+    function dfs(k){
+      if (k === n) return true;
+      if (++nodes > 200000) return false;
+      var g = order[k], c = shuffle(allowed[g]);
+      for (var i=0;i<c.length;i++){
+        var r = c[i]; if (used[r]) continue;
+        used[r] = true; res[g] = r;
+        if (dfs(k+1)) return true;
+        used[r] = false; res[g] = -1;
+      }
+      return false;
+    }
+    return dfs(0) ? res : null;
+  }
+  window.__aixSolve = solve;
+
+  function doDraw(){
+    var n = S.names.length, allowed = [];
+    for (var i=0;i<n;i++){
+      allowed[i] = [];
+      for (var j=0;j<n;j++) if (i!==j && !excluded(i,j)) allowed[i].push(j);
+    }
+    var a = solve(n, allowed);
+    if (!a){ ui.err = 'Con esas exclusiones no hay ningún sorteo posible. Quita alguna exclusión.'; return false; }
+    S.assign = a; S.seen = {}; S.phase = 'draw'; save(); return true;
+  }
+
+  // ---------- Pantallas ----------
+  function viewNames(){
+    var input = el('input',{type:'text',placeholder:'Nombre (ej. Marta)',maxlength:'24',id:'nm'});
+    function add(){
+      var v = input.value.trim();
+      if (!v) return;
+      if (S.names.some(function(x){ return x.toLowerCase() === v.toLowerCase(); })){ ui.err = 'Ese nombre ya está. Si hay dos iguales, añade una inicial (Ana M. / Ana P.).'; return render(); }
+      ui.err = ''; S.names.push(v); save(); render(); var i2 = document.getElementById('nm'); if (i2) i2.focus();
+    }
+    input.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); add(); } });
+    var chips = el('div',{class:'chips'}, S.names.map(function(nm,i){
+      return el('span',{class:'chip'},[el('span',{text:nm}), el('button',{type:'button','aria-label':'Quitar '+nm,text:'×',onclick:function(){ S.names.splice(i,1); save(); render(); }})]);
+    }));
+    return [
+      box('¿Quiénes juegan?',[
+        para('Escribe los nombres de todos los participantes (mínimo 3).','hint'),
+        el('div',{class:'row'},[input, btn('Añadir', add, 'alt fix')]),
+        errBox(), chips,
+        btn('Siguiente →', function(){ ui.err=''; S.phase='excl'; save(); render(); }, '', S.names.length < 3)
+      ])
+    ];
+  }
+
+  function viewExcl(){
+    var opts = function(){ return S.names.map(function(nm,i){ return el('option',{value:String(i),text:nm}); }); };
+    var selA = el('select',{'aria-label':'Quién no puede regalar'}, opts());
+    var selB = el('select',{'aria-label':'A quién no puede regalar'}, opts());
+    if (S.names.length > 1) selB.value = '1';
+    var both = el('input',{type:'checkbox',id:'both'}); both.checked = true;
+    function add(){
+      var a = +selA.value, b = +selB.value;
+      if (a === b){ ui.err = 'Elige dos personas distintas (nadie se regala a sí mismo, eso ya va incluido).'; return render(); }
+      ui.err = '';
+      if (!excluded(a,b)) S.excl.push([a,b]);
+      if (both.checked && !excluded(b,a)) S.excl.push([b,a]);
+      save(); render();
+    }
+    var list = el('div',{class:'chips'}, S.excl.map(function(x,i){
+      return el('span',{class:'chip'},[el('span',{text:S.names[x[0]]+' ✗ '+S.names[x[1]]}),
+        el('button',{type:'button','aria-label':'Quitar exclusión',text:'×',onclick:function(){ S.excl.splice(i,1); save(); render(); }})]);
+    }));
+    return [
+      box('¿Quién no puede regalar a quién?',[
+        para('Parejas, hermanos, quien ya se regala todo el año… Añade las exclusiones que haga falta. Si no hay ninguna, sigue adelante.','hint'),
+        el('div',{class:'row'},[selA, el('span',{class:'fix',text:'no puede regalar a'}), selB]),
+        el('label',{class:'check',for:'both'},[both, el('span',{text:'También al revés (ej. parejas)'})]),
+        btn('Añadir exclusión', add, 'alt'),
+        errBox(),
+        S.excl.length ? list : para('Sin exclusiones por ahora.','hint'),
+        el('div',{class:'row'},[
+          btn('← Volver', function(){ S.excl=[]; ui.err=''; S.phase='names'; save(); render(); }, 'ghost'),
+          btn('Siguiente →', function(){
+            ui.err=''; S.phase='curses'; save(); render();
+          })
+        ])
+      ])
+    ];
+  }
+
+  function viewCurses(){
+    var pend = S.names.filter(function(nm,i){ return !S.curses[i]; }).length;
+    if (ui.curseWho !== null){
+      var i = ui.curseWho;
+      var ta = el('textarea',{maxlength:'80',placeholder:'Ej.: el cargador que nunca encuentro',id:'cu'});
+      return [box('Hola, '+S.names[i],[
+        para('Que nadie mire. Escribe el objeto cotidiano que te persigue (tu "maldición"). Quien te toque tendrá que regalártelo, pero mejorado.','hint'),
+        ta, errBox(),
+        el('div',{class:'row'},[
+          btn('Cancelar', function(){ ui.curseWho=null; ui.err=''; render(); }, 'ghost'),
+          btn('Guardar y ocultar', function(){
+            var v = ta.value.trim();
+            if (!v){ ui.err = 'Escribe algo, aunque sea un calcetín.'; return render(); }
+            S.curses[i] = v; ui.curseWho = null; ui.err = ''; save(); render();
+          }, 'pk')
+        ])
+      ])];
+    }
+    var grid = el('div',{class:'names'}, S.names.map(function(nm,i){
+      var done = !!S.curses[i];
+      return btn((done ? '✓ ' : '') + nm, function(){
+        if (done && !confirm('¿Cambiar la maldición de '+nm+'? Se pedirá una nueva.')) return;
+        ui.curseWho = i; ui.err=''; render();
+      }, done ? 'done' : '');
+    }));
+    return [box('Cada uno escribe su maldición',[
+      para('Por turnos: toca tu nombre, escribe tu maldición y se oculta. Así nadie ve la de los demás.','hint'),
+      grid, errBox(),
+      pend ? para('Faltan '+pend+' por escribir.','hint') : null,
+      el('div',{class:'row'},[
+        btn('← Volver', function(){ ui.err=''; S.phase='excl'; save(); render(); }, 'ghost'),
+        btn('🎲 Hacer el sorteo', function(){ ui.err=''; if (doDraw()) render(); else render(); }, 'pk', pend > 0)
+      ])
+    ])];
+  }
+
+  function viewDraw(){
+    if (ui.reveal !== null){
+      var i = ui.reveal, r = S.assign[i];
+      return [box('Tu sorteo, '+S.names[i],[
+        el('div',{class:'reveal'},[
+          para('Le regalas a…'),
+          el('div',{class:'who',text:S.names[r]}),
+          para('Su maldición es…'),
+          el('div',{class:'curse',text:S.curses[r]}),
+          para('Hazle <b>dos regalos</b>: su maldición mejorada (con leyenda falsa) y un regalo normal de máx. 15 €.'.replace(/<\/?b>/g,''),'hint')
+        ]),
+        btn('Entendido, ocultar', function(){ ui.reveal = null; ui.who = null; render(); }, 'pk big')
+      ])];
+    }
+    if (ui.who !== null){
+      var w = ui.who;
+      return [box('¿Eres '+S.names[w]+'?',[
+        para('Asegúrate de que nadie más mira la pantalla.','hint'),
+        el('div',{class:'row'},[
+          btn('← No, volver', function(){ ui.who = null; render(); }, 'ghost'),
+          btn('Sí, ver mi sorteo', function(){ S.seen[w] = true; save(); ui.reveal = w; render(); }, 'pk')
+        ])
+      ])];
+    }
+    var left = S.names.filter(function(nm,i){ return !S.seen[i]; }).length;
+    var grid = el('div',{class:'names'}, S.names.map(function(nm,i){
+      var seen = !!S.seen[i];
+      return btn((seen ? '✓ ' : '') + nm, function(){
+        if (seen){
+          if (!confirm(nm+' ya lo ha visto. ¿Volver a mostrarlo? Que nadie más mire.')) return;
+        }
+        ui.who = i; render();
+      }, seen ? 'done' : '');
+    }));
+    return [box('Toca tu nombre',[
+      para(left ? 'Cada uno ve su sorteo cuando le toque. Faltan '+left+'.' : '¡Todos han visto su sorteo! A preparar los regalos 🎁', 'hint'),
+      grid
+    ])];
+  }
+
+  function render(){
+    var app = document.getElementById('app');
+    app.textContent = '';
+    var views = { names:viewNames, excl:viewExcl, curses:viewCurses, draw:viewDraw };
+    (views[S.phase]() || []).forEach(function(n){ app.appendChild(n); });
+    var st = document.getElementById('steps'); st.textContent = '';
+    PHASES.forEach(function(p){ st.appendChild(el('span',{class:p[0]===S.phase?'on':'',text:p[1]})); });
+    window.scrollTo(0,0);
+  }
+
+  document.getElementById('reset').addEventListener('click', function(){
+    if (!confirm('¿Empezar de nuevo? Se borran participantes, exclusiones, maldiciones y el sorteo.')) return;
+    S = fresh(); ui = { err:'', who:null, reveal:null, curseWho:null }; save(); render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
