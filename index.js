@@ -23,6 +23,7 @@
   const anio  = ["1743","1812","1969","el año 3000","el verano de 1987","un martes cualquiera","el invierno de 1923","la noche de San Juan de 1999","hace tres lunes","el día que se cayó internet","poco antes del Big Bang"];
   const extra = ["Desde entonces trae mala suerte… pero solo los jueves.","Se dice que habla en sueños.","Fue tasado por un experto que salió corriendo.","Su dueño anterior desapareció sin dejar rastro (se fue de vacaciones).","Está maldito, pero con garantía de dos años.","Lo guardaron en una vitrina y la vitrina huyó.","Quien lo toca estornuda tres veces seguidas.","Cada luna llena cambia de color, pero nadie lo ha visto.","Los expertos lo declararon «inclasificable» y se fueron a comer.","Si lo agitas, suena a una versión de Bonanza.","Tiene tres propietarios anteriores y los tres lo negaron."];
   const rnd = n => { const b = new Uint32Array(1), lim = Math.floor(4294967296/n)*n; do { crypto.getRandomValues(b); } while (b[0] >= lim); return b[0] % n; };
+  const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
   const pick = a => a[rnd(a.length)];
   const gen = document.getElementById('gen'), btnGen = document.getElementById('btnGen');
   const tabs = [...document.querySelectorAll('.tab')];
@@ -32,7 +33,7 @@
   const nextRima = deck(rimas), nextIdea = deck(ideas);
   const MODES = {
     ley: { label:'📜 Inventar leyenda', cls:'alt', rhyme:false, make:() => ['Este objeto fue hallado en ', {b:pick(donde)}, ' por ', {b:pick(quien)}, ' en ', {b:pick(anio)}, '. ' + pick(extra)] },
-    mal: { label:'🧦 Inventar maldición', cls:'', rhyme:false, make:() => ['Tu maldición es:', {br:true}, {b:nextIdea()}] },
+    mal: { label:'🧦 Inventar maldición', cls:'', rhyme:false, make:() => ['Tu maldición es:', {br:true}, {b:cap(nextIdea())}] },
     pis: { label:'🎲 Dame una pista en rima', cls:'pk', rhyme:true, make:() => [nextRima()] }
   };
   // Se construye con nodos DOM (textContent): nada se interpreta como HTML.

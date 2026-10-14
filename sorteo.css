@@ -40,3 +40,9 @@
   .tiny{font-size:.85rem;color:var(--muted);text-align:center;margin-top:18px}
   .link{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;font:inherit}
 .noscript{background:var(--yellow);color:#1b1035;border:3px solid #1b1035;border-radius:14px;padding:12px 16px;margin:18px 0;font-weight:700}
+  /* La maldición, como una nota de papel de las instrucciones */
+  textarea.paper{min-height:110px;margin:14px 0 6px;padding:16px 16px 14px;font-size:1.25rem;font-weight:700;line-height:32px;color:#1b1035;
+    background-color:#fff7e6;background-image:repeating-linear-gradient(transparent 0,transparent 31px,#1b103522 31px,#1b103522 32px);
+    border:3px solid #1b1035;border-radius:14px;box-shadow:5px 5px 0 var(--pink);transform:rotate(-1deg);transition:transform .15s}
+  textarea.paper:focus{outline:3px solid var(--teal);outline-offset:3px;transform:rotate(0)}
+  textarea.paper::placeholder{color:#1b103566;font-weight:400;font-style:italic}

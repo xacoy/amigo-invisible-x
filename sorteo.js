@@ -152,7 +152,7 @@
     var pend = S.names.filter(function(nm,i){ return !S.curses[i]; }).length;
     if (ui.curseWho !== null){
       var i = ui.curseWho;
-      var ta = el('textarea',{maxlength:'80',placeholder:'Ej.: el cargador que nunca encuentro',id:'cu'});
+      var ta = el('textarea',{maxlength:'80',placeholder:'Ej.: El cargador que nunca encuentro',id:'cu',class:'paper','aria-label':'Tu maldición'});
       return [box('Hola, '+S.names[i],[
         para('Que nadie mire. Escribe el objeto cotidiano que te persigue (tu "maldición"). Quien te toque tendrá que regalártelo, pero mejorado.','hint'),
         ta,
@@ -161,8 +161,9 @@
           var free = IDEAS.filter(function(x){ return used.indexOf(x.toLowerCase()) < 0; });
           if (!free.length){ ui.err = 'Ya no quedan ideas sin usar. Escribe la tuya.'; return render(); }
           ui.err = '';
-          ta.value = free[rnd(free.length)];
-          ui.tried = (ui.tried || []).concat(ta.value.toLowerCase());
+          var idea = free[rnd(free.length)];
+          ta.value = idea.charAt(0).toUpperCase() + idea.slice(1);
+          ui.tried = (ui.tried || []).concat(idea.toLowerCase());
         }, 'alt'),
         errBox(),
         el('div',{class:'row'},[
