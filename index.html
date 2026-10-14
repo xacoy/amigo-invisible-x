@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amigo Invisible X</title>
+<style>
+  :root{--bg:#fff7ed;--card:#fff;--ink:#1f2937;--mute:#6b7280;--acc:#dc2626;--acc2:#16a34a;--line:#e5e7eb}
+  @media (prefers-color-scheme:dark){:root{--bg:#111827;--card:#1f2937;--ink:#f3f4f6;--mute:#9ca3af;--line:#374151}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif}
+  main{max-width:640px;margin:0 auto;padding:16px}
+  h1{margin:8px 0;font-size:1.8rem} h2{font-size:1.1rem;margin:0 0 8px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0}
+  label{display:block;font-size:.85rem;color:var(--mute);margin:8px 0 2px}
+  input,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+  button{padding:10px 14px;border:0;border-radius:10px;background:var(--acc);color:#fff;font:inherit;font-weight:600;cursor:pointer}
+  button.sec{background:var(--line);color:var(--ink)} button.ok{background:var(--acc2)}
+  .row{display:flex;gap:8px;align-items:center;margin:6px 0}.row>input{flex:1}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .mute{color:var(--mute);font-size:.85rem}
+  .big{font-size:2.2rem;text-align:center;margin:12px 0;font-weight:800}
+  .link{display:flex;gap:6px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:8px 0}
+  .hidden{display:none}
+  .pill{display:inline-block;background:var(--line);border-radius:99px;padding:2px 10px;margin:2px;font-size:.85rem}
+</style>
+</head>
+<body>
+<main>
+
+<section id="setup">
+  <h1>🎁 Amigo Invisible X</h1>
+  <p class="mute">El sorteo se hace en tu navegador. Nadie ve los resultados, ni tú: cada persona recibe un enlace privado.</p>
+
+  <div class="card">
+    <h2>1. Participantes</h2>
+    <div id="people"></div>
+    <button class="sec" onclick="addPerson()">+ Añadir persona</button>
+  </div>
+
+  <div class="card">
+    <h2>2. Exclusiones <span class="mute">(parejas, etc.)</span></h2>
+    <p class="mute">Estas dos personas no se tocarán entre sí.</p>
+    <div class="grid"><select id="exA"></select><select id="exB"></select></div>
+    <div class="row"><button class="sec" onclick="addEx()">Añadir exclusión</button></div>
+    <div id="exList"></div>
+  </div>
+
+  <div class="card">
+    <h2>3. Datos del evento</h2>
+    <label>Nombre del evento</label><input id="evName" value="Amigo Invisible">
+    <div class="grid">
+      <div><label>Presupuesto</label><input id="budget" placeholder="15 €"></div>
+      <div><label>Fecha de entrega</label><input id="date" placeholder="20 de diciembre"></div>
+    </div>
+  </div>
+
+  <button class="ok" style="width:100%;font-size:1.1rem" onclick="draw()">🎲 Hacer sorteo</button>
+  <p id="err" class="mute" style="color:var(--acc)"></p>
+
+  <div id="results" class="card hidden">
+    <h2>Enlaces privados</h2>
+    <p class="mute">Envía a cada persona SOLO su enlace. Si abres uno, verás su resultado.</p>
+    <div id="links"></div>
+  </div>
+</section>
+
+<section id="reveal" class="hidden">
+  <h1 id="rEvent">🎁</h1>
+  <div class="card" style="text-align:center">
+    <p>Hola, <b id="rFrom"></b> 👋</p>
+    <button id="rBtn" onclick="show()" style="width:100%;font-size:1.2rem">👀 Descubrir mi amigo invisible</button>
+    <div id="rBox" class="hidden">
+      <p class="mute">Tu amigo invisible es:</p>
+      <div class="big" id="rTo"></div>
+      <div id="rInfo" class="mute"></div>
+      <p class="mute">Guarda el secreto 🤫</p>
+    </div>
+  </div>
+</section>
+
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let ex=[];
+const DEF=["","","","","","",""];
+
+function addPerson(v=""){const d=document.createElement("div");d.className="row";
+ d.innerHTML=`<input placeholder="Nombre" value="${v}" oninput="refresh()"><button class="sec" onclick="this.parentNode.remove();refresh()">✕</button>`;
+ $("people").appendChild(d);refresh();}
+function names(){return [...$("people").querySelectorAll("input")].map(i=>i.value.trim()).filter(Boolean);}
+function refresh(){const n=names();["exA","exB"].forEach(id=>{const s=$(id),v=s.value;
+ s.innerHTML=n.map(x=>`<option>${esc(x)}</option>`).join("");if(n.includes(v))s.value=v;});
+ $("exList").innerHTML=ex.map((e,i)=>`<span class="pill">${esc(e[0])} ✕ ${esc(e[1])} <a href="#" onclick="ex.splice(${i},1);refresh();return false">quitar</a></span>`).join("");}
+function addEx(){const a=$("exA").value,b=$("exB").value;if(a&&b&&a!==b&&!ex.some(e=>e.includes(a)&&e.includes(b))){ex.push([a,b]);refresh();}}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=crypto.getRandomValues(new Uint32Array(1))[0]%(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
+function bad(a,b){return a===b||ex.some(e=>e.includes(a)&&e.includes(b));}
+function solve(n){for(let t=0;t<5000;t++){const r=shuffle(n);if(n.every((x,i)=>!bad(x,r[i])))return r;}return null;}
+
+function draw(){const n=names();$("err").textContent="";
+ if(new Set(n).size!==n.length)return $("err").textContent="Hay nombres repetidos.";
+ if(n.length<3)return $("err").textContent="Hacen falta al menos 3 personas.";
+ const r=solve(n);if(!r)return $("err").textContent="Con esas exclusiones no hay solución. Quita alguna.";
+ const base=location.href.split("#")[0];
+ $("links").innerHTML="";
+ n.forEach((from,i)=>{
+  const d={e:$("evName").value,b:$("budget").value,f:$("date").value,from,to:r[i]};
+  const url=base+"#"+btoa(unescape(encodeURIComponent(JSON.stringify(d))));
+  const l=document.createElement("div");l.className="link";
+  l.innerHTML=`<b>${esc(from)}</b><span><button class="sec" data-u="${url}" onclick="navigator.clipboard.writeText(this.dataset.u);this.textContent='✓ Copiado'">Copiar enlace</button> <a href="https://wa.me/?text=${encodeURIComponent('🎁 '+d.e+' — tu enlace privado, '+from+': '+url)}" target="_blank" rel="noopener"><button class="ok">WhatsApp</button></a></span>`;
+  $("links").appendChild(l);});
+ $("results").classList.remove("hidden");$("results").scrollIntoView({behavior:"smooth"});}
+
+function show(){$("rBtn").classList.add("hidden");$("rBox").classList.remove("hidden");}
+(function(){
+ if(!location.hash.slice(1))return;
+ try{const d=JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(1)))));
+  $("setup").classList.add("hidden");$("reveal").classList.remove("hidden");
+  $("rEvent").textContent="🎁 "+d.e;$("rFrom").textContent=d.from;$("rTo").textContent=d.to;
+  const i=[];if(d.b)i.push("💰 Presupuesto: "+d.b);if(d.f)i.push("📅 Entrega: "+d.f);
+  $("rInfo").innerHTML=i.map(x=>"<p>"+esc(x)+"</p>").join("");
+ }catch(e){}
+})();
+DEF.forEach(addPerson);
+</script>
+</body>
+</html>
