@@ -58,8 +58,12 @@
   .todo{background:var(--yellow);color:#1b1035;border:3px solid #1b1035;border-radius:14px;padding:12px 16px;margin-top:14px;font-size:1.15rem;transform:rotate(-1deg);box-shadow:4px 4px 0 #1b1035}
   footer{text-align:center;color:var(--muted);padding:26px 0 60px;font-size:.95rem}
   .sock{display:inline-block;animation:wob 2.5s ease-in-out infinite}
-  .secret{color:var(--muted);font-size:.8rem;text-decoration:none;opacity:.18;transition:opacity .25s;padding:6px 10px;border-radius:99px}
-  .secret:hover,.secret:focus-visible{opacity:1;background:var(--pink);color:#fff}
+  .cta-wrap{text-align:center;margin:18px 0 6px}
+  .cta{display:inline-block;background:var(--teal);color:#1b1035;text-decoration:none;font-weight:900;font-size:1.4rem;padding:14px 30px;border:3px solid #1b1035;border-radius:18px;box-shadow:5px 5px 0 var(--pink);transition:transform .1s;animation:pulse 2.2s ease-in-out infinite}
+  .cta:hover,.cta:focus-visible{background:var(--yellow);transform:translateY(-2px) scale(1.04);outline:none}
+  .cta:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--pink)}
+  @keyframes pulse{0%,100%{box-shadow:5px 5px 0 var(--pink)}50%{box-shadow:5px 5px 0 var(--pink),0 0 0 8px #2de2c544}}
+  @media (prefers-reduced-motion:reduce){.cta{animation:none}}
   @media (prefers-reduced-motion:reduce){.logo,.sock{animation:none}}
 .noscript{background:var(--yellow);color:#1b1035;border:3px solid #1b1035;border-radius:14px;padding:12px 16px;margin:18px 0;font-weight:700}
 .lnk{color:var(--yellow)}
