@@ -207,7 +207,7 @@
 <section>
   <div class="num">5</div>
   <h2>Pistas en rima torcida</h2>
-  <p>Cada invisible manda <b>tres pistas</b> antes de la entrega, siempre en verso malo y torcido. Si te faltan versos, usa la pestaña «Pista» del <a href="#generador" style="color:var(--yellow)">generador</a>.</p>
+  <p>Cada invisible manda <b>tres pistas</b> antes de la entrega, siempre en verso malo y torcido. Si te faltan versos, usa la pestaña «Pista en rima» del <a href="#generador" style="color:var(--yellow)">generador</a>.</p>
 </section>
 
 <!-- 6 -->
@@ -272,12 +272,12 @@
 <!-- Generador -->
 <section id="generador">
   <div class="num">★</div>
-  <h2>Generador de leyendas, maldiciones y pistas</h2>
+  <h2>Generador de leyendas, maldiciones y pistas en rima</h2>
   <p>¿Sin inspiración? Elige qué necesitas y que lo invente el destino.</p>
   <div class="tabs" role="tablist" aria-label="Qué inventar">
     <button class="tab" role="tab" id="tab-ley" aria-selected="true" data-k="ley">📜 Leyenda</button>
     <button class="tab" role="tab" id="tab-mal" aria-selected="false" data-k="mal">🧦 Maldición</button>
-    <button class="tab" role="tab" id="tab-pis" aria-selected="false" data-k="pis">🎲 Pista</button>
+    <button class="tab" role="tab" id="tab-pis" aria-selected="false" data-k="pis">🎲 Pista en rima</button>
   </div>
   <div class="gen" id="gen" role="tabpanel" aria-live="polite">Pulsa el botón…</div>
   <p style="text-align:center;margin-bottom:0"><button class="btn alt" id="btnGen">📜 Inventar leyenda</button></p>
@@ -340,7 +340,7 @@
   const MODES = {
     ley: { label:'📜 Inventar leyenda', cls:'alt', rhyme:false, make:() => `Este objeto fue hallado en <b>${pick(donde)}</b> por <b>${pick(quien)}</b> en <b>${pick(anio)}</b>. ${pick(extra)}` },
     mal: { label:'🧦 Inventar maldición', cls:'', rhyme:false, make:() => `Tu maldición es:<br><b>${nextIdea()}</b>` },
-    pis: { label:'🎲 Dame una pista', cls:'pk', rhyme:true, make:() => nextRima().replace(/&/g,'&amp;').replace(/</g,'&lt;') }
+    pis: { label:'🎲 Dame una pista en rima', cls:'pk', rhyme:true, make:() => nextRima().replace(/&/g,'&amp;').replace(/</g,'&lt;') }
   };
   const last = {};
   let mode = 'ley';
@@ -350,10 +350,10 @@
     btnGen.textContent = m.label; btnGen.className = 'btn ' + m.cls;
     gen.className = 'gen' + (m.rhyme ? ' rhyme' : '');
     gen.setAttribute('aria-labelledby', 'tab-' + k);
-    gen.innerHTML = last[k] || 'Pulsa el botón…';
+    gen.innerHTML = '<span>' + (last[k] || 'Pulsa el botón…') + '</span>';
   }
   tabs.forEach(t => t.addEventListener('click', () => setMode(t.dataset.k)));
-  btnGen.addEventListener('click', () => { last[mode] = MODES[mode].make(); gen.innerHTML = last[mode]; });
+  btnGen.addEventListener('click', () => { last[mode] = MODES[mode].make(); gen.innerHTML = '<span>' + last[mode] + '</span>'; });
   setMode('ley');
 </script>
 </body>
