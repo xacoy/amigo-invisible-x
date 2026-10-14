@@ -45,6 +45,22 @@
   .tiny{font-size:.85rem;color:var(--muted);text-align:center;margin-top:18px}
   .link{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;font:inherit}
   .prize{font-size:2rem}
+  .catx{margin:16px 0 6px;padding:12px;background:#00000033;border-radius:16px}
+  .cathead{display:flex;gap:12px;align-items:center}
+  .cathead .ce{font-size:2.4rem;line-height:1;filter:drop-shadow(2px 2px 0 var(--pink))}
+  .cathead .ct{font-weight:900;color:var(--teal);font-size:1.1rem;line-height:1.2}
+  .cathead .hint{font-size:.85rem}
+  .tags{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:12px;margin-top:12px}
+  .tagb{font:inherit;font-weight:900;display:flex;align-items:center;gap:8px;text-align:left;cursor:pointer;color:#1b1035;background:#fff7e6;border:3px solid #1b1035;border-radius:6px 16px 16px 6px;padding:8px 10px 8px 24px;position:relative;box-shadow:3px 3px 0 #1b1035;transition:transform .12s,background .12s}
+  .tagb::before{content:'';position:absolute;left:7px;top:50%;width:9px;height:9px;margin-top:-5px;border-radius:50%;background:var(--bg2);border:2px solid #1b1035}
+  .tagb:nth-child(odd){transform:rotate(-1.5deg)} .tagb:nth-child(even){transform:rotate(1.5deg)}
+  .tagb:hover,.tagb:focus-visible{transform:rotate(0) translateY(-2px);outline:none}
+  .tagb[aria-checked=true]{background:var(--yellow);transform:rotate(0) scale(1.06);box-shadow:4px 4px 0 var(--pink);animation:pop .25s}
+  .tagb[aria-checked=true]::after{content:'✔';position:absolute;top:-12px;right:-8px;width:24px;height:24px;border-radius:50%;background:var(--pink);color:#fff;border:2px solid #1b1035;display:grid;place-items:center;font-size:.8rem}
+  .av{flex:0 0 auto;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;border:2px solid #1b1035;font-size:.9rem;color:#1b1035}
+  .nm{word-break:break-word;line-height:1.1}
+  @keyframes pop{0%{transform:scale(.9) rotate(-4deg)}100%{transform:scale(1.06) rotate(0)}}
+  @media (prefers-reduced-motion:reduce){.tagb[aria-checked=true]{animation:none}}
 </style>
 </head>
 <body>
@@ -144,24 +160,42 @@
   function viewVotos(){
     if (ui.voter !== null){
       var v = ui.voter;
+      ui.picks = ui.picks || {};
+      var COLORS = ['#ff4fa3','#ffd23f','#2de2c5','#ff8a3d','#c9b8ff'];
       var others = names.map(function(n,i){return i;}).filter(function(i){return i!==v;});
-      var sels = CATS.map(function(c){
-        var s = el('select',{'aria-label':c[1]},[el('option',{value:'',text:'— elige —'})].concat(others.map(function(i){ return el('option',{value:String(i),text:names[i]}); })));
-        return [c, s];
+      var blocks = CATS.map(function(c){
+        var emoji = c[1].split(' ')[0], title = c[1].slice(c[1].indexOf(' ')+1);
+        var tags = others.map(function(i){
+          var b = el('button',{type:'button',class:'tagb',role:'radio','aria-checked':ui.picks[c[0]]===i?'true':'false'},[
+            el('span',{class:'av',style:'background:'+COLORS[i%COLORS.length],text:names[i].charAt(0).toUpperCase()}),
+            el('span',{class:'nm',text:names[i]})
+          ]);
+          b.addEventListener('click', function(){
+            ui.picks[c[0]] = i; ui.err = '';
+            var er = document.querySelector('#app .err'); if (er) er.remove();
+            var sib = b.parentNode.children;
+            for (var q=0;q<sib.length;q++) sib[q].setAttribute('aria-checked', sib[q]===b ? 'true' : 'false');
+          });
+          return b;
+        });
+        return el('div',{class:'catx'},[
+          el('div',{class:'cathead'},[el('span',{class:'ce',text:emoji}), el('div',{},[el('div',{class:'ct',text:title}), el('div',{class:'hint',text:c[2]})])]),
+          el('div',{class:'tags',role:'radiogroup','aria-label':title}, tags)
+        ]);
       });
       return [box('Vota, '+names[v],[
-        para('Que nadie mire. No puedes votarte a ti mismo.','hint'),
-        el('div',{}, sels.map(function(x){ return el('div',{},[el('label',{class:'cat',text:x[0][1]}), para(x[0][2],'hint'), x[1]]); })),
+        para('Que nadie mire. Toca una etiqueta por premio. No puedes votarte a ti mismo.','hint'),
+        el('div',{}, blocks),
         ui.err ? el('div',{class:'err',text:ui.err}) : null,
         el('div',{class:'row'},[
-          btn('Cancelar', function(){ ui.voter=null; ui.err=''; render(); }, 'ghost'),
+          btn('Cancelar', function(){ ui.voter=null; ui.picks={}; ui.err=''; render(); }, 'ghost'),
           btn('Guardar y ocultar', function(){
             var out = {};
-            for (var k=0;k<sels.length;k++){
-              if (sels[k][1].value === ''){ ui.err = 'Falta elegir en «'+sels[k][0][1]+'».'; return render(); }
-              out[sels[k][0][0]] = +sels[k][1].value;
+            for (var k=0;k<CATS.length;k++){
+              if (typeof ui.picks[CATS[k][0]] !== 'number'){ ui.err = 'Falta elegir en «'+CATS[k][1].slice(CATS[k][1].indexOf(' ')+1)+'».'; return render(); }
+              out[CATS[k][0]] = ui.picks[CATS[k][0]];
             }
-            F.votes[v] = out; F.voted[v] = true; ui.voter = null; ui.err = ''; save(); render();
+            F.votes[v] = out; F.voted[v] = true; ui.voter = null; ui.picks = {}; ui.err = ''; save(); render();
           }, 'pk')
         ])
       ])];
@@ -173,7 +207,7 @@
         var done = !!F.voted[i];
         return btn((done?'✓ ':'')+nm, function(){
           if (done && !confirm('¿Cambiar el voto de '+nm+'?')) return;
-          ui.voter = i; ui.err=''; render();
+          ui.voter = i; ui.picks = {}; ui.err=''; render();
         }, done?'done':'');
       })),
       el('div',{class:'row'},[
