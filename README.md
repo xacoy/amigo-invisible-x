@@ -4,7 +4,7 @@ Sorteo de amigo invisible en una sola página (`index.html`), sin servidor ni cu
 
 - Añade los participantes y, si quieres, exclusiones (por ejemplo, parejas).
 - El sorteo se hace en tu navegador: nadie ve los resultados, ni quien organiza.
-- Cada persona recibe un enlace privado con su resultado.
+- Cada persona recibe un enlace privado con su resultado, un reto divertido y una restricción secreta para el regalo (opcionales).
 
 ## Uso
 

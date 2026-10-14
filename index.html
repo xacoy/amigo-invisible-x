@@ -13,7 +13,7 @@
   h1{margin:8px 0;font-size:1.8rem} h2{font-size:1.1rem;margin:0 0 8px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0}
   label{display:block;font-size:.85rem;color:var(--mute);margin:8px 0 2px}
-  input,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+  input,textarea,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
   button{padding:10px 14px;border:0;border-radius:10px;background:var(--acc);color:#fff;font:inherit;font-weight:600;cursor:pointer}
   button.sec{background:var(--line);color:var(--ink)} button.ok{background:var(--acc2)}
   .row{display:flex;gap:8px;align-items:center;margin:6px 0}.row>input{flex:1}
@@ -28,6 +28,7 @@
 <body>
 <main>
 
+<!-- ORGANIZADOR -->
 <section id="setup">
   <h1>🎁 Amigo Invisible X</h1>
   <p class="mute">El sorteo se hace en tu navegador. Nadie ve los resultados, ni tú: cada persona recibe un enlace privado.</p>
@@ -47,12 +48,15 @@
   </div>
 
   <div class="card">
-    <h2>3. Datos del evento</h2>
-    <label>Nombre del evento</label><input id="evName" value="Amigo Invisible">
+    <h2>3. Reglas del evento</h2>
+    <label>Nombre del evento</label><input id="evName" value="Amigo Invisible X">
     <div class="grid">
-      <div><label>Presupuesto</label><input id="budget" placeholder="15 €"></div>
+      <div><label>Presupuesto</label><input id="budget" value="15 €"></div>
       <div><label>Fecha de entrega</label><input id="date" placeholder="20 de diciembre"></div>
     </div>
+    <label>Tema (opcional)</label><input id="theme" placeholder="Regalo útil, pero ridículo">
+    <label><input type="checkbox" id="chal" checked style="width:auto"> Dar a cada persona un reto divertido</label>
+    <label><input type="checkbox" id="hint" checked style="width:auto"> Dar a cada persona una restricción secreta para el regalo</label>
   </div>
 
   <button class="ok" style="width:100%;font-size:1.1rem" onclick="draw()">🎲 Hacer sorteo</button>
@@ -60,11 +64,13 @@
 
   <div id="results" class="card hidden">
     <h2>Enlaces privados</h2>
-    <p class="mute">Envía a cada persona SOLO su enlace. Si abres uno, verás su resultado.</p>
+    <p class="mute">Envía a cada persona SOLO su enlace (WhatsApp, etc.). Si abres uno, verás su resultado.</p>
     <div id="links"></div>
+    <button class="sec" onclick="copyAll()" style="margin-top:10px">Copiar todos (para repartir)</button>
   </div>
 </section>
 
+<!-- RECEPTOR -->
 <section id="reveal" class="hidden">
   <h1 id="rEvent">🎁</h1>
   <div class="card" style="text-align:center">
@@ -81,9 +87,11 @@
 
 </main>
 <script>
+const RETOS=["Entrega el regalo imitando a un personaje famoso.","Escribe una pista en forma de poema.","El destinatario debe adivinar quién eres con 3 preguntas de sí/no.","Envuelve el regalo de la forma más absurda posible.","Entrega el regalo cantando.","Manda una pista falsa al grupo para despistar.","Presenta el regalo como si fuese un anuncio de teletienda.","Haz un brindis dedicado a tu amigo invisible."];
+const RESTR=["Que se pueda comer o beber.","Que huela bien (o muy mal, con cariño).","Hecho a mano o reciclado.","Máximo 5 € (el reto es la creatividad).","Algo que se pueda usar en la fiesta.","Algo del color favorito de tu amigo invisible.","Un regalo \"útil pero ridículo\".","Que tenga relación con una anécdota compartida."];
 const $=id=>document.getElementById(id);
 let ex=[];
-const DEF=["","","","","","",""];
+const DEF=["Ana","Luis","Marta","Pablo","Lucía","Diego","Elena"];
 
 function addPerson(v=""){const d=document.createElement("div");d.className="row";
  d.innerHTML=`<input placeholder="Nombre" value="${v}" oninput="refresh()"><button class="sec" onclick="this.parentNode.remove();refresh()">✕</button>`;
@@ -96,29 +104,38 @@ function addEx(){const a=$("exA").value,b=$("exB").value;if(a&&b&&a!==b&&!ex.som
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=crypto.getRandomValues(new Uint32Array(1))[0]%(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
 function bad(a,b){return a===b||ex.some(e=>e.includes(a)&&e.includes(b));}
+
 function solve(n){for(let t=0;t<5000;t++){const r=shuffle(n);if(n.every((x,i)=>!bad(x,r[i])))return r;}return null;}
 
 function draw(){const n=names();$("err").textContent="";
  if(new Set(n).size!==n.length)return $("err").textContent="Hay nombres repetidos.";
  if(n.length<3)return $("err").textContent="Hacen falta al menos 3 personas.";
  const r=solve(n);if(!r)return $("err").textContent="Con esas exclusiones no hay solución. Quita alguna.";
+ const retos=shuffle(RETOS),res=shuffle(RESTR);
  const base=location.href.split("#")[0];
- $("links").innerHTML="";
+ $("links").innerHTML="";window._links=[];
  n.forEach((from,i)=>{
-  const d={e:$("evName").value,b:$("budget").value,f:$("date").value,from,to:r[i]};
+  const d={e:$("evName").value,b:$("budget").value,f:$("date").value,t:$("theme").value,
+   from,to:r[i]};
+  if($("chal").checked)d.c=retos[i%retos.length];
+  if($("hint").checked)d.h=res[i%res.length];
   const url=base+"#"+btoa(unescape(encodeURIComponent(JSON.stringify(d))));
+  window._links.push(from+": "+url);
   const l=document.createElement("div");l.className="link";
   l.innerHTML=`<b>${esc(from)}</b><span><button class="sec" data-u="${url}" onclick="navigator.clipboard.writeText(this.dataset.u);this.textContent='✓ Copiado'">Copiar enlace</button> <a href="https://wa.me/?text=${encodeURIComponent('🎁 '+d.e+' — tu enlace privado, '+from+': '+url)}" target="_blank" rel="noopener"><button class="ok">WhatsApp</button></a></span>`;
   $("links").appendChild(l);});
  $("results").classList.remove("hidden");$("results").scrollIntoView({behavior:"smooth"});}
+function copyAll(){navigator.clipboard.writeText(window._links.join("\n\n"));}
 
+// Modo receptor
 function show(){$("rBtn").classList.add("hidden");$("rBox").classList.remove("hidden");}
 (function(){
  if(!location.hash.slice(1))return;
  try{const d=JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(1)))));
   $("setup").classList.add("hidden");$("reveal").classList.remove("hidden");
   $("rEvent").textContent="🎁 "+d.e;$("rFrom").textContent=d.from;$("rTo").textContent=d.to;
-  const i=[];if(d.b)i.push("💰 Presupuesto: "+d.b);if(d.f)i.push("📅 Entrega: "+d.f);
+  const i=[];if(d.b)i.push("💰 Presupuesto: "+d.b);if(d.f)i.push("📅 Entrega: "+d.f);if(d.t)i.push("🎨 Tema: "+d.t);
+  if(d.h)i.push("🤫 Tu restricción: "+d.h);if(d.c)i.push("🎭 Tu reto: "+d.c);
   $("rInfo").innerHTML=i.map(x=>"<p>"+esc(x)+"</p>").join("");
  }catch(e){}
 })();
