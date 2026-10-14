@@ -1,7 +1,10 @@
 <!doctype html>
+<!-- AIX · Amigo Invisible X — © 2026 xacoy — GNU GPL v3 (ver LICENSE). Sin garantías: ver aviso.html -->
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Amigo Invisible X</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -9,73 +12,15 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#1b1035">
 <meta name="description" content="AIX: el Amigo Invisible Maldito (o Bendito). Instrucciones oficiales de un ritual absurdo.">
-<style>
-  :root{
-    --bg:#1b1035; --bg2:#2a1750; --ink:#fff7e6; --muted:#c9b8ff;
-    --pink:#ff4fa3; --yellow:#ffd23f; --teal:#2de2c5; --orange:#ff8a3d;
-  }
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{
-    margin:0; font-family:"Trebuchet MS","Comic Sans MS",system-ui,sans-serif;
-    color:var(--ink); background:var(--bg);
-    background-image:radial-gradient(circle at 20% 10%,#4b1d8f55,transparent 40%),
-                     radial-gradient(circle at 85% 30%,#ff4fa333,transparent 35%),
-                     radial-gradient(circle at 50% 90%,#2de2c522,transparent 40%);
-    line-height:1.55;
-  }
-  .wrap{max-width:900px;margin:0 auto;padding:0 18px}
-  header{text-align:center;padding:48px 0 24px}
-  .logo{
-    font-size:clamp(5rem,22vw,11rem); font-weight:900; letter-spacing:.04em; margin:0; line-height:1;
-    color:var(--yellow); text-shadow:4px 4px 0 var(--pink),8px 8px 0 var(--teal);
-    display:inline-block; animation:wob 4s ease-in-out infinite;
-  }
-  @keyframes wob{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
-  .sub{font-size:1.3rem;color:var(--muted);margin:10px 0 0}
-  .tag{display:inline-block;background:var(--pink);color:#fff;padding:4px 14px;border-radius:99px;font-weight:700;transform:rotate(-3deg);margin-top:14px}
-  .hero svg{width:100%;max-width:560px;height:auto;margin:18px auto 0;display:block}
-  section{background:var(--bg2);border:3px solid var(--yellow);border-radius:22px;padding:24px 22px;margin:34px 0;
-          box-shadow:8px 8px 0 var(--pink);position:relative}
-  section:nth-of-type(even){border-color:var(--teal);box-shadow:8px 8px 0 var(--orange)}
-  .num{position:absolute;top:-24px;left:18px;background:var(--yellow);color:#1b1035;font-weight:900;font-size:1.5rem;
-       width:48px;height:48px;border-radius:50%;display:grid;place-items:center;border:3px solid #1b1035;transform:rotate(-8deg)}
-  h2{margin:6px 0 10px 40px;font-size:1.6rem;color:var(--yellow)}
-  section:nth-of-type(even) h2{color:var(--teal)}
-  .row{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
-  .row svg{flex:0 0 190px;width:190px;height:auto}
-  .row .txt{flex:1 1 260px}
-  .quote{background:#00000033;border-left:6px solid var(--pink);padding:10px 14px;border-radius:0 12px 12px 0;font-style:italic;margin:10px 0}
-  ul{padding-left:1.2rem} li{margin:6px 0}
-  .legend{background:#fff7e6;color:#1b1035;border-radius:14px;padding:12px 16px;transform:rotate(-1deg);font-weight:700;margin-top:12px}
-  .btn{
-    font:inherit;font-weight:900;font-size:1.05rem;border:3px solid #1b1035;border-radius:14px;padding:12px 18px;cursor:pointer;
-    background:var(--yellow);color:#1b1035;box-shadow:4px 4px 0 #1b1035;transition:transform .1s
-  }
-  .btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 #1b1035}
-  .btn.alt{background:var(--teal)} .btn.pk{background:var(--pink);color:#fff}
-  .gen{background:#00000040;border-radius:16px;padding:16px;margin-top:12px;min-height:84px;font-size:1.15rem;display:flex;align-items:center;justify-content:center;text-align:center}
-  .gen b{color:var(--yellow)}
-  .gen.rhyme{white-space:pre-line}
-  .tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:14px 0 0}
-  .tab{font:inherit;font-weight:900;font-size:1rem;border:3px solid #1b1035;border-radius:14px;padding:8px 14px;cursor:pointer;background:#fff7e6;color:#1b1035;box-shadow:3px 3px 0 #1b1035;transition:transform .1s}
-  .tab[aria-selected=true]{background:var(--yellow);box-shadow:3px 3px 0 var(--pink);transform:translateY(-2px)}
-  .tab:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #1b1035}
-  .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:12px}
-  .card{background:#00000033;border-radius:16px;padding:14px;text-align:center}
-  .card svg{width:90px;height:90px}
-  .card h3{margin:6px 0;color:var(--yellow)}
-  .rhyme{font-size:1.1rem;text-align:center;white-space:pre-line}
-  .todo{background:var(--yellow);color:#1b1035;border:3px solid #1b1035;border-radius:14px;padding:12px 16px;margin-top:14px;font-size:1.15rem;transform:rotate(-1deg);box-shadow:4px 4px 0 #1b1035}
-  footer{text-align:center;color:var(--muted);padding:26px 0 60px;font-size:.95rem}
-  .sock{display:inline-block;animation:wob 2.5s ease-in-out infinite}
-  .secret{color:var(--muted);font-size:.8rem;text-decoration:none;opacity:.18;transition:opacity .25s;padding:6px 10px;border-radius:99px}
-  .secret:hover,.secret:focus-visible{opacity:1;background:var(--pink);color:#fff}
-  @media (prefers-reduced-motion:reduce){.logo,.sock{animation:none}}
-</style>
+<meta property="og:title" content="Amigo Invisible X">
+<meta property="og:description" content="El Amigo Invisible Maldito (o Bendito). Instrucciones oficiales de un ritual absurdo.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_ES">
+<link rel="stylesheet" href="index.css">
 </head>
 <body>
 <div class="wrap">
+<noscript><p class="noscript">Esta web necesita JavaScript activado para funcionar. No usa ningún servidor: todo ocurre en tu navegador.</p></noscript>
 
 <header class="hero">
   <h1 class="logo">AIX</h1>
@@ -207,7 +152,7 @@
 <section>
   <div class="num">5</div>
   <h2>Pistas en rima torcida</h2>
-  <p>Cada invisible manda <b>tres pistas</b> antes de la entrega, siempre en verso malo y torcido. Si te faltan versos, usa la pestaña «Pista en rima» del <a href="#generador" style="color:var(--yellow)">generador</a>.</p>
+  <p>Cada invisible manda <b>tres pistas</b> antes de la entrega, siempre en verso malo y torcido. Si te faltan versos, usa la pestaña «Pista en rima» del <a class="lnk" href="#generador">generador</a>.</p>
 </section>
 
 <!-- 6 -->
@@ -280,7 +225,7 @@
     <button class="tab" role="tab" id="tab-pis" aria-selected="false" data-k="pis">🎲 Pista en rima</button>
   </div>
   <div class="gen" id="gen" role="tabpanel" aria-live="polite">Pulsa el botón…</div>
-  <p style="text-align:center;margin-bottom:0"><button class="btn alt" id="btnGen">📜 Inventar leyenda</button></p>
+  <p class="center"><button class="btn alt" id="btnGen">📜 Inventar leyenda</button></p>
 </section>
 
 <!-- Resumen -->
@@ -302,59 +247,11 @@
   <span class="sock">🧦</span> AIX · Hecho con mala idea y buena intención.<br>
   Ningún calcetín fue maltratado en la elaboración de esta web (algunos, un poco).
   <p><a class="secret" href="sorteo.html" aria-label="Ir al sorteo" title="🤫">🎲 Ir al sorteo</a></p>
+  <p class="legal">Proyecto de ocio, sin garantías · <a href="aviso.html">Aviso, privacidad y licencia</a> · GNU GPL v3</p>
 </footer>
 </div>
 
 <script src="ideas.js"></script>
-<script>
-  const rimas = [
-    "Lo que te doy no es un bollo,\nni tampoco es un pimiento.\nSi lo adivinas, te adoro;\nsi no, me río un momento.",
-    "Tengo cara de inocente\ny manos de gran ladrón.\nTe regalo lo que odias,\npero con mucha pasión.",
-    "No soy tu madre ni tu tía,\npero te sigo la pista.\nSi te sientas en la silla,\nme verás con cara lista.",
-    "Una vez perdí un zapato\ny encontré una profecía:\nque tú vas a ser mi presa\nel día de la alegría.",
-    "Ni soy rojo, ni soy verde,\nni me gusta el champiñón.\nSi me miras fijamente,\nme pongo a hacer un montón.",
-    "Llevo un regalo escondido\nen el bolsillo del abrigo.\nSi me miras con sospecha,\nme río, pero no te digo.",
-    "No me busques en la lista,\nni me busques en la nube.\nSoy el que te mira raro\ncada vez que el turrón sube.",
-    "Ni soy ángel ni soy diablo,\nsoy un tipo con envoltorio.\nSi no adivinas mi nombre,\ntoca ir al laboratorio.",
-    "Una pista, dos pistas, tres:\nsoy de los que llegan tarde.\nSi me ves con cara rara,\nes que el regalo ya arde.",
-    "Tu maldición tiene dueño\ny ese dueño soy yo.\nLa mejoré con esmero,\nquién sabe si te gustó.",
-    "Me han dicho que soy discreto,\npero tiemblo al disimular.\nSi me ves sudar la frente,\nes que me quiero delatar.",
-    "Compré lo normal en rebajas\ny lo absurdo en el desván.\nDe tu cara al abrirlos\nme voy a reír de más.",
-    "Yo no sé de poesía,\npero sé de calcetines.\nSi me tocas, ten cuidado:\ntengo planes y tengo fines.",
-    "El que lee estas pistas\nya está metido en el lío.\nNo soy ni tu primo ni tu tío,\npero casi, ¡qué desvarío!",
-    "Con papel de regalo viejo\ny cinta de aquel verano,\nenvolveré tu maldición\ncon todo mi cariño insano.",
-    "Si tu regalo se mueve,\nno es magia, es mi sobrino.\nSi tu regalo huele raro,\nes mi estilo, es mi destino.",
-    "Voy vestido de misterio\ny calzado de ironía.\nTe regalo lo que sueñas\no lo que se me ocurría."
-  ];
-  const quien = ["un arqueólogo borracho","una monja con muy mala leche","un pirata jubilado","un cartero con superpoderes","un tío abuelo que nadie recuerda","una cabra con título universitario","un taxista que había leído demasiado","una abuela con un detector de metales","un mago retirado sin conejo","tres gaviotas con sombrero","un notario sin ganas de notariar","el conserje del edificio de enfrente","un vendedor de enciclopedias muy convincente","un grupo de turistas perdidos"];
-  const donde = ["las ruinas de Teguise","un contenedor de Santa Cruz","la cima del Teide a las 3 de la mañana","el fondo de un baúl de 1743","una gasolinera de Fuerteventura","debajo de un sofá en La Laguna","el buzón de una casa deshabitada","un ascensor averiado de un hotel de Benidorm","la sala de espera de un dentista","un mercadillo a las seis de la mañana","el maletero de un coche abandonado","el tejado de una iglesia","un faro en pleno temporal","el baño de un bar sin nombre"];
-  const anio  = ["1743","1812","1969","el año 3000","el verano de 1987","un martes cualquiera","el invierno de 1923","la noche de San Juan de 1999","hace tres lunes","el día que se cayó internet","poco antes del Big Bang"];
-  const extra = ["Desde entonces trae mala suerte… pero solo los jueves.","Se dice que habla en sueños.","Fue tasado por un experto que salió corriendo.","Su dueño anterior desapareció sin dejar rastro (se fue de vacaciones).","Está maldito, pero con garantía de dos años.","Lo guardaron en una vitrina y la vitrina huyó.","Quien lo toca estornuda tres veces seguidas.","Cada luna llena cambia de color, pero nadie lo ha visto.","Los expertos lo declararon «inclasificable» y se fueron a comer.","Si lo agitas, suena a una versión de Bonanza.","Tiene tres propietarios anteriores y los tres lo negaron."];
-  const pick = a => a[Math.floor(Math.random()*a.length)];
-  const gen = document.getElementById('gen'), btnGen = document.getElementById('btnGen');
-  const tabs = [...document.querySelectorAll('.tab')];
-  const ideas = window.AIX_IDEAS || [];
-  const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
-  const deck = (arr) => { let d = []; return () => { if (!d.length) d = shuffle(arr); return d.pop(); }; };
-  const nextRima = deck(rimas), nextIdea = deck(ideas);
-  const MODES = {
-    ley: { label:'📜 Inventar leyenda', cls:'alt', rhyme:false, make:() => `Este objeto fue hallado en <b>${pick(donde)}</b> por <b>${pick(quien)}</b> en <b>${pick(anio)}</b>. ${pick(extra)}` },
-    mal: { label:'🧦 Inventar maldición', cls:'', rhyme:false, make:() => `Tu maldición es:<br><b>${nextIdea()}</b>` },
-    pis: { label:'🎲 Dame una pista en rima', cls:'pk', rhyme:true, make:() => nextRima().replace(/&/g,'&amp;').replace(/</g,'&lt;') }
-  };
-  const last = {};
-  let mode = 'ley';
-  function setMode(k){
-    mode = k; const m = MODES[k];
-    tabs.forEach(t => t.setAttribute('aria-selected', t.dataset.k === k ? 'true' : 'false'));
-    btnGen.textContent = m.label; btnGen.className = 'btn ' + m.cls;
-    gen.className = 'gen' + (m.rhyme ? ' rhyme' : '');
-    gen.setAttribute('aria-labelledby', 'tab-' + k);
-    gen.innerHTML = '<span>' + (last[k] || 'Pulsa el botón…') + '</span>';
-  }
-  tabs.forEach(t => t.addEventListener('click', () => setMode(t.dataset.k)));
-  btnGen.addEventListener('click', () => { last[mode] = MODES[mode].make(); gen.innerHTML = '<span>' + last[mode] + '</span>'; });
-  setMode('ley');
-</script>
+<script src="index.js"></script>
 </body>
 </html>
