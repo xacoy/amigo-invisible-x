@@ -43,6 +43,7 @@
   .reveal{text-align:center;padding:10px 0}
   .reveal .who{font-size:2.4rem;font-weight:900;color:var(--yellow);text-shadow:3px 3px 0 var(--pink);word-break:break-word}
   .reveal .curse{background:#fff7e6;color:#1b1035;border-radius:14px;padding:12px 16px;margin:12px 0;font-weight:700;font-size:1.2rem;transform:rotate(-1deg);word-break:break-word}
+  .cl{grid-column:1/-1;background:#fff7e6;color:#1b1035;border-radius:14px;padding:10px 14px;font-weight:700;word-break:break-word}
   .tiny{font-size:.85rem;color:var(--muted);text-align:center;margin-top:18px}
   .link{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;font:inherit}
 </style>
@@ -56,7 +57,7 @@
   </header>
   <main id="app"></main>
   <p class="tiny">Todo ocurre en este dispositivo: no se envía nada a ningún sitio.<br>
-    <button class="link" id="reset">Empezar de nuevo</button> · <a class="link" href="index.html">Ver instrucciones</a></p>
+    <button class="link" id="reset">Empezar de nuevo</button> · <a class="link" href="index.html">Ver instrucciones</a> · <a class="link" href="fiesta.html">Fiesta</a></p>
 </div>
 
 <script>
@@ -64,7 +65,10 @@
   var KEY = 'aix_sorteo_v1';
   var PHASES = [['names','1 · Participantes'],['excl','2 · Exclusiones'],['curses','3 · Maldiciones'],['draw','4 · Sorteo']];
   var S = load() || fresh();
-  var ui = { err:'', step:null, who:null, reveal:null, curseWho:null, msg:'' };
+  var ui = { err:'', step:null, who:null, reveal:null, curseWho:null, msg:'', list:false, listOrder:null, restored:false };
+  var IDEAS = ['el cargador que nunca encuentro','el calcetín que siempre se queda sin pareja','la cuchara que siempre falta','el mando de la tele, desaparecido','las llaves, justo cuando tengo prisa','el boli que nunca escribe','el paraguas que olvido en cada sitio','el táper sin tapa','el auricular izquierdo, siempre perdido','la sartén que se pega','la goma del pelo que desaparece','el abrelatas que no abre','la bolsa de plástico llena de bolsas','el cable que no sé de qué es','el enchufe que no llega','el pendrive de 2009','la pila que casi no va','el tupper que me prestaron y nunca devolví','la tapa del bolígrafo mordisqueada','las gafas de sol, siempre en el otro bolso'];
+  var restoredFrom = !!load();
+  if (restoredFrom && (S.names.length || S.phase !== 'names')) ui.restored = true;
 
   function fresh(){ return { phase:'names', names:[], excl:[], curses:{}, assign:null, seen:{} }; }
   function load(){ try{ var r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; }catch(e){ return null; } }
@@ -185,7 +189,12 @@
       var ta = el('textarea',{maxlength:'80',placeholder:'Ej.: el cargador que nunca encuentro',id:'cu'});
       return [box('Hola, '+S.names[i],[
         para('Que nadie mire. Escribe el objeto cotidiano que te persigue (tu "maldición"). Quien te toque tendrá que regalártelo, pero mejorado.','hint'),
-        ta, errBox(),
+        ta,
+        btn('🎲 No se me ocurre nada, dame una', function(){ var used = Object.keys(S.curses).map(function(k){ return S.curses[k]; });
+        var free = IDEAS.filter(function(x){ return used.indexOf(x) < 0; });
+        var pool = free.length ? free : IDEAS;
+        ta.value = pool[Math.floor(Math.random()*pool.length)]; }, 'alt'),
+        errBox(),
         el('div',{class:'row'},[
           btn('Cancelar', function(){ ui.curseWho=null; ui.err=''; render(); }, 'ghost'),
           btn('Guardar y ocultar', function(){
@@ -214,7 +223,21 @@
     ])];
   }
 
+  function viewList(){
+    if (!ui.listOrder){
+      ui.listOrder = shuffle(S.names.map(function(nm,i){ return S.curses[i]; }).filter(Boolean));
+    }
+    return [box('🕵️ Las maldiciones del grupo',[
+      para('Todas mezcladas y sin nombres. ¿De quién es cada una? Debatid, apostad y no os chivéis.','hint'),
+      el('div',{class:'names'}, ui.listOrder.map(function(c,k){
+        return el('div',{class:'cl',text:(k+1)+'. '+c});
+      })),
+      btn('← Volver', function(){ ui.list = false; render(); }, 'ghost')
+    ])];
+  }
+
   function viewDraw(){
+    if (ui.list) return viewList();
     if (ui.reveal !== null){
       var i = ui.reveal, r = S.assign[i];
       return [box('Tu sorteo, '+S.names[i],[
@@ -250,7 +273,11 @@
     }));
     return [box('Toca tu nombre',[
       para(left ? 'Cada uno ve su sorteo cuando le toque. Faltan '+left+'.' : '¡Todos han visto su sorteo! A preparar los regalos 🎁', 'hint'),
-      grid
+      grid,
+      el('div',{class:'row'},[
+        btn('🕵️ Ver las maldiciones (sin nombres)', function(){ ui.list = true; ui.listOrder = null; render(); }, 'alt'),
+        el('a',{class:'btn pk',href:'fiesta.html',text:'🎉 Ir a la fiesta'})
+      ])
     ])];
   }
 
@@ -258,6 +285,17 @@
     var app = document.getElementById('app');
     app.textContent = '';
     var views = { names:viewNames, excl:viewExcl, curses:viewCurses, draw:viewDraw };
+    if (ui.restored){
+      var phaseTxt = { names:'participantes', excl:'exclusiones', curses:'maldiciones', draw:'sorteo hecho' }[S.phase];
+      var extra = S.phase === 'draw' ? ' '+Object.keys(S.seen).length+' de '+S.names.length+' ya han visto su sorteo.' : '';
+      app.appendChild(box('👋 Tienes un sorteo guardado',[
+        para('He recuperado lo que había en este dispositivo ('+S.names.length+' participantes, fase: '+phaseTxt+').'+extra+' ¿Seguimos donde estabas o empezamos de cero?','hint'),
+        el('div',{class:'row'},[
+          btn('Seguir', function(){ ui.restored = false; render(); }, 'alt'),
+          btn('Empezar de cero', function(){ if (confirm('Se borra todo lo guardado. ¿Seguro?')){ S = fresh(); ui = { err:'', who:null, reveal:null, curseWho:null, list:false, listOrder:null, restored:false }; save(); render(); } }, 'pk')
+        ])
+      ]));
+    }
     (views[S.phase]() || []).forEach(function(n){ app.appendChild(n); });
     var st = document.getElementById('steps'); st.textContent = '';
     PHASES.forEach(function(p){ st.appendChild(el('span',{class:p[0]===S.phase?'on':'',text:p[1]})); });
@@ -266,7 +304,11 @@
 
   document.getElementById('reset').addEventListener('click', function(){
     if (!confirm('¿Empezar de nuevo? Se borran participantes, exclusiones, maldiciones y el sorteo.')) return;
-    S = fresh(); ui = { err:'', who:null, reveal:null, curseWho:null }; save(); render();
+    S = fresh(); ui = { err:'', who:null, reveal:null, curseWho:null, list:false, listOrder:null, restored:false }; save(); render();
+  });
+
+  window.addEventListener('beforeunload', function(e){
+    if (S.names.length){ e.preventDefault(); e.returnValue = ''; }
   });
 
   render();
