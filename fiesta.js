@@ -4,7 +4,7 @@
   var PHASES = [['turnos','1 · Discursos'],['votos','2 · Votaciones'],['premios','3 · Premios']];
   var CATS = [
     ['absurdo','🎁 Mejor regalo absurdo','Vota a quien lo regaló.'],
-    ['poker','🧦 Calcetín del Destino (peor cara de póker)','Quien peor disimuló durante la entrega en silencio.']
+    ['inutil','🧦 Calcetín del Destino (el regalo más inútil)','El regalo más cutre, más inútil o más de mierda. Vota a quien lo regaló.']
   ];
   var MIN = 30; // segundos mínimos de discurso
 
