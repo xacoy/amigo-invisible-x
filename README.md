@@ -5,6 +5,7 @@ Web de AIX (Amigo Invisible eXtraño), sin servidor ni cuentas.
 - `index.html`: las instrucciones del ritual, con generador de leyendas, maldiciones y pistas en rima.
 - `sorteo.html`: el sorteo por turnos (participantes, exclusiones, maldiciones y reparto).
 - `fiesta.html`: discursos con cronómetro y votaciones secretas.
+- `corporativo.html`: insultos que no lo parecen, estilo oficina ochentera (con traductor y generador de frases).
 - `aviso.html`: aviso, privacidad y licencia.
 
 Con GitHub Pages activado (rama `main`, carpeta `/ (root)`): https://xacoy.github.io/amigo-invisible-x/
